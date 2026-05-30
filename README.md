@@ -1,59 +1,213 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pusat Data - API Provider Setup Documentation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📋 Project Overview
+Pusat Data adalah server API yang menyediakan Single Source of Truth untuk data mahasiswa dalam ekosistem sistem informasi akademik.
 
-## About Laravel
+## ✅ Yang Sudah Dikonfigurasi
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. Database Configuration
+- **Database Name**: `pusat_data`
+- **Connection**: MySQL
+- **Credentials**: root (no password)
+- **File**: `.env` sudah dikonfigurasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 2. Mahasiswa Model & Migration
+**Model**: `app/Models/Mahasiswa.php`
+- Primary Key: `nim` (string)
+- Fillable fields: nim, nama, program_studi, fakultas
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Migration**: `database/migrations/2026_05_28_080844_create_mahasiswas_table.php`
+- nim (string, 20 chars, primary key)
+- nama (string, 100 chars)
+- program_studi (string, 100 chars)
+- fakultas (string, 100 chars)
+- timestamps
 
-## Learning Laravel
+### 3. API Controller
+**File**: `app/Http/Controllers/Api/MahasiswaController.php`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+**Endpoints yang tersedia**:
+- `GET /api/mahasiswa` - List semua mahasiswa
+- `POST /api/mahasiswa` - Tambah mahasiswa baru
+- `GET /api/mahasiswa/{nim}` - Detail mahasiswa berdasarkan NIM
+- `PUT /api/mahasiswa/{nim}` - Update data mahasiswa
+- `DELETE /api/mahasiswa/{nim}` - Hapus mahasiswa
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Response Format**:
+```json
+{
+    "success": true,
+    "data": {
+        "nim": "2021001",
+        "nama": "Budi Santoso",
+        "program_studi": "Teknik Informatika",
+        "fakultas": "Fakultas Teknik"
+    }
+}
+```
 
-## Laravel Sponsors
+**Error Response (404)**:
+```json
+{
+    "success": false,
+    "message": "Data mahasiswa tidak ditemukan"
+}
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 4. API Routes
+**File**: `routes/api.php`
+- Menggunakan `Route::apiResource('mahasiswa', MahasiswaController::class)`
+- Semua routes otomatis ter-prefix dengan `/api`
 
-### Premium Partners
+### 5. Sample Data Seeder
+**File**: `database/seeders/MahasiswaSeeder.php`
+- Berisi 10 sample mahasiswa
+- Berbagai fakultas dan program studi
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 6. Laravel Sanctum
+- Sedang dalam proses instalasi
+- Akan digunakan untuk autentikasi token API
 
-## Contributing
+## 🚀 Langkah Selanjutnya
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Start MySQL Server
+Buka XAMPP Control Panel dan start MySQL/MariaDB
 
-## Code of Conduct
+### 2. Create Database
+```bash
+E:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE IF NOT EXISTS pusat_data CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Atau buat manual via phpMyAdmin:
+- Buka http://localhost/phpmyadmin
+- Create database: `pusat_data`
+- Collation: `utf8mb4_unicode_ci`
 
-## Security Vulnerabilities
+### 3. Run Migrations
+```bash
+cd e:\kuliah\semester6\laravel\pusat-data
+php artisan migrate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Run Seeder
+```bash
+php artisan db:seed --class=MahasiswaSeeder
+```
 
-## License
+### 5. Test API
+Start development server:
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Test endpoint:
+```bash
+# Get all mahasiswa
+curl http://localhost:8000/api/mahasiswa
+
+# Get specific mahasiswa
+curl http://localhost:8000/api/mahasiswa/2021001
+```
+
+## 🔐 API Authentication (Sanctum)
+
+### Publish Sanctum Configuration
+```bash
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+```
+
+### Run Sanctum Migrations
+```bash
+php artisan migrate
+```
+
+### Generate API Token
+Buat controller untuk generate token:
+```php
+use Laravel\Sanctum\HasApiTokens;
+
+// Di User model, tambahkan trait:
+use HasApiTokens;
+
+// Generate token:
+$token = $user->createToken('api-token')->plainTextToken;
+```
+
+### Protect Routes
+```php
+// Di routes/api.php
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('mahasiswa', MahasiswaController::class);
+});
+```
+
+## 📱 Admin Interface (To Be Created)
+
+### Install Tailwind CSS
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+### Create Admin Views
+- Dashboard untuk manage mahasiswa
+- Form tambah/edit mahasiswa
+- Table list mahasiswa dengan search & pagination
+
+## 🔗 Integration dengan Client Systems
+
+### Sistem Presensi
+```php
+// Client akan hit endpoint:
+GET /api/mahasiswa/{nim}
+
+// Response digunakan untuk validasi kehadiran
+```
+
+### Sistem Perpustakaan
+```php
+// Client akan hit endpoint:
+GET /api/mahasiswa/{nim}
+
+// Response digunakan untuk data peminjam
+```
+
+### Sistem Skripsi
+```php
+// Client akan hit endpoint:
+GET /api/mahasiswa/{nim}
+
+// Response digunakan untuk validasi pengajuan judul
+```
+
+## 📝 Sample Data
+Seeder sudah berisi 10 mahasiswa:
+- 2021001 - Budi Santoso (Teknik Informatika)
+- 2021002 - Siti Nurhaliza (Sistem Informasi)
+- 2021003 - Ahmad Fauzi (Teknik Elektro)
+- 2021004 - Dewi Lestari (Manajemen)
+- 2021005 - Rizki Pratama (Akuntansi)
+- 2021006 - Putri Ayu (Psikologi)
+- 2021007 - Andi Wijaya (Hukum)
+- 2021008 - Maya Sari (Kedokteran)
+- 2021009 - Doni Setiawan (Arsitektur)
+- 2021010 - Rina Wati (Sastra Inggris)
+
+## 🛠️ Troubleshooting
+
+### Error: SQLSTATE[HY000] [1049] Unknown database
+- MySQL belum running atau database belum dibuat
+- Jalankan langkah 1 dan 2 di atas
+
+### Error: Class 'Laravel\Sanctum\...' not found
+- Tunggu hingga `php artisan install:api` selesai
+- Atau jalankan: `composer require laravel/sanctum`
+
+### Error: Failed opening required vendor/...
+- Composer sedang update packages
+- Tunggu hingga proses selesai
+
+## 📚 Resources
+- Laravel Documentation: https://laravel.com/docs
+- Laravel Sanctum: https://laravel.com/docs/sanctum
+- REST API Best Practices: https://restfulapi.net/
