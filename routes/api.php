@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\MahasiswaController;
 use App\Http\Controllers\Api\DosenController;
 use App\Http\Controllers\Api\UnitController;
 use App\Http\Middleware\EnsureApiClientActive;
+use App\Http\Controllers\Api\PemasokDataController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,6 @@ Route::middleware(['auth:sanctum', EnsureApiClientActive::class])->group(functio
     Route::get('/units/fakultas', [UnitController::class, 'getFakultas']);
     Route::get('/units/prodi/{fakultasId}', [UnitController::class, 'getProdiByFakultas']);
     Route::apiResource('units', UnitController::class);
+
+    Route::post('/peminjaman/kirim', [PemasokDataController::class, 'terimaDataPeminjaman']);
 });
