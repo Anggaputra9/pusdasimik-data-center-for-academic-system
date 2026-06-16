@@ -27,5 +27,8 @@ Route::middleware(['auth:sanctum', EnsureApiClientActive::class])->group(functio
     Route::get('/units/prodi/{fakultasId}', [UnitController::class, 'getProdiByFakultas']);
     Route::apiResource('units', UnitController::class);
 
+    
     Route::post('/peminjaman/kirim', [PemasokDataController::class, 'terimaDataPeminjaman']);
+    
+    Route::post('/terima-data', [PemasokDataController::class, 'terimaDataPeminjaman']);
 });
