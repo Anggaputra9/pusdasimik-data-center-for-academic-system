@@ -21,5 +21,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('api-client/{apiClient}/tokens', [ApiClientController::class, 'issueToken'])->name('api-client.tokens.store');
     Route::delete('api-client/{apiClient}/tokens/{tokenId}', [ApiClientController::class, 'revokeToken'])->name('api-client.tokens.destroy');
 
-    Route::get('/log-perpus', [\App\Http\Controllers\Api\PemasokDataController::class, 'tampilkanLogPerpus'])->name('log-perpus');
+    // ✅ Hanya nama route diubah dari 'log-perpus' menjadi 'perpus.log' agar cocok dengan sidebar
+    Route::get('/log-perpus', [\App\Http\Controllers\Api\PemasokDataController::class, 'tampilkanLogPerpus'])->name('perpus.log');
 });
