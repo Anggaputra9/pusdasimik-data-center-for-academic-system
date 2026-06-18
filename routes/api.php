@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\DosenController;
 use App\Http\Controllers\Api\UnitController;
 use App\Http\Middleware\EnsureApiClientActive;
 use App\Http\Controllers\Api\PemasokDataController;
+use App\Http\Controllers\Api\PengajuanJudulController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,4 +32,7 @@ Route::middleware(['auth:sanctum', EnsureApiClientActive::class])->group(functio
     Route::post('/peminjaman/kirim', [PemasokDataController::class, 'terimaDataPeminjaman']);
     
     Route::post('/terima-data', [PemasokDataController::class, 'terimaDataPeminjaman']);
+
+    // ✅ TAMBAHAN BARU: Endpoint untuk menerima data pengajuan judul dari sistem-pengajuan-judul
+    Route::post('/pengajuan-judul/kirim', [PengajuanJudulController::class, 'terimaPengajuanJudul']);
 });

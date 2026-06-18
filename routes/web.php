@@ -23,4 +23,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // ✅ Hanya nama route diubah dari 'log-perpus' menjadi 'perpus.log' agar cocok dengan sidebar
     Route::get('/log-perpus', [\App\Http\Controllers\Api\PemasokDataController::class, 'tampilkanLogPerpus'])->name('perpus.log');
+
+    // ✅ TAMBAHAN BARU: Route untuk menampilkan log pengajuan judul
+    Route::get('/log-pengajuan-judul', [\App\Http\Controllers\Api\PengajuanJudulController::class, 'tampilkanLogPengajuanJudul'])->name('pengajuan-judul.log');
 });
