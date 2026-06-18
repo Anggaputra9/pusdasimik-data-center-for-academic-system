@@ -24,9 +24,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // ✅ Hanya nama route diubah dari 'log-perpus' menjadi 'perpus.log' agar cocok dengan sidebar
     Route::get('/log-perpus', [\App\Http\Controllers\Api\PemasokDataController::class, 'tampilkanLogPerpus'])->name('perpus.log');
+<<<<<<< HEAD
     
     // Log Presensi routes
     Route::get('/presensi', [PresensiController::class, 'index'])->name('presensi.index');
     Route::get('/presensi/export', [PresensiController::class, 'export'])->name('presensi.export');
     Route::get('/presensi/{id}', [PresensiController::class, 'show'])->name('presensi.show');
 });
+=======
+
+    // ✅ TAMBAHAN BARU: Route untuk menampilkan log pengajuan judul
+    Route::get('/log-pengajuan-judul', [\App\Http\Controllers\Api\PengajuanJudulController::class, 'tampilkanLogPengajuanJudul'])->name('pengajuan-judul.log');
+});
+>>>>>>> 007497464b8af2dde6a9b3f406c15e00a89ea3ae
