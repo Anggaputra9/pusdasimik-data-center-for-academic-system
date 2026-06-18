@@ -28,16 +28,11 @@ Route::middleware(['auth:sanctum', EnsureApiClientActive::class])->group(functio
     Route::get('/units/prodi/{fakultasId}', [UnitController::class, 'getProdiByFakultas']);
     Route::apiResource('units', UnitController::class);
 
-    
     Route::post('/peminjaman/kirim', [PemasokDataController::class, 'terimaDataPeminjaman']);
     Route::post('/presensi/kirim', [PemasokDataController::class, 'terimaDataPresensi']);
     
     Route::post('/terima-data', [PemasokDataController::class, 'terimaDataPeminjaman']);
-<<<<<<< HEAD
-});
-=======
 
     // ✅ TAMBAHAN BARU: Endpoint untuk menerima data pengajuan judul dari sistem-pengajuan-judul
     Route::post('/pengajuan-judul/kirim', [PengajuanJudulController::class, 'terimaPengajuanJudul']);
 });
->>>>>>> 007497464b8af2dde6a9b3f406c15e00a89ea3ae
