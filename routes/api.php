@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum', EnsureApiClientActive::class])->group(functio
 
     
     Route::post('/peminjaman/kirim', [PemasokDataController::class, 'terimaDataPeminjaman']);
+    Route::post('/presensi/kirim', [PemasokDataController::class, 'terimaDataPresensi']);
     
     Route::post('/terima-data', [PemasokDataController::class, 'terimaDataPeminjaman']);
 });

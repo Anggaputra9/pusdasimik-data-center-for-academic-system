@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\LogPresensi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; // Menggunakan DB Facade agar super aman gais
 use Illuminate\Support\Facades\Validator;
@@ -117,5 +118,55 @@ class PemasokDataController extends Controller
         }
 
         return view('admin.perpus.log_perpus', compact('logs'));
+    }
+
+    /**
+     * FUNGSI 3: Menerima data presensi dari sistem-presensi
+     */
+    public function terimaDataPresensi(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nim_mahasiswa' => 'required|string',
+            'kode_kelas' => 'required|string',
+            'nama_mata_kuliah' => 'required|string',
+            'status_kehadiran' => 'required|in:hadir,terlambat,izin,sakit,alpha',
+            'waktu' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format data presensi tidak valid',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Ambil nama mahasiswa dari database pusat data
+            $mahasiswa = DB::table('mahasiswas')->where('nim', $request->nim_mahasiswa)->first();
+            $namaMahasiswa = $mahasiswa ? $mahasiswa->nama : null;
+
+            // Simpan log presensi
+            LogPresensi::create([
+                'nim_mahasiswa' => $request->nim_mahasiswa,
+                'nama_mahasiswa' => $namaMahasiswa,
+                'kode_kelas' => $request->kode_kelas,
+                'nama_mata_kuliah' => $request->nama_mata_kuliah,
+                'status_kehadiran' => $request->status_kehadiran,
+                'waktu' => $request->waktu,
+                'sistem_asal' => 'sistem-presensi',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data presensi berhasil disinkronisasi ke Pusat Data'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan data presensi: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
