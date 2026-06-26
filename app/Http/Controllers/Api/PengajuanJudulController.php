@@ -39,42 +39,60 @@ class PengajuanJudulController extends Controller
                 ], 500);
             }
 
+            $idColumn = null;
+
+            if (Schema::hasColumn('log_pengajuan_judul', 'id_pengajuan')) {
+                $idColumn = 'id_pengajuan';
+            } elseif (Schema::hasColumn('log_pengajuan_judul', 'external_submission_id')) {
+                $idColumn = 'external_submission_id';
+            }
+
+            if (!$idColumn) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kolom id_pengajuan atau external_submission_id belum tersedia di tabel log_pengajuan_judul.'
+                ], 500);
+            }
+
+            $prodiColumn = null;
+
+            if (Schema::hasColumn('log_pengajuan_judul', 'prodi')) {
+                $prodiColumn = 'prodi';
+            } elseif (Schema::hasColumn('log_pengajuan_judul', 'program_studi')) {
+                $prodiColumn = 'program_studi';
+            }
+
+            $data = [
+                $idColumn         => $request->id_pengajuan,
+                'nim'             => $request->nim,
+                'nama_mahasiswa'  => $request->nama_mahasiswa,
+                'fakultas'        => $request->fakultas,
+                'judul'           => $request->judul,
+                'deskripsi'       => $request->deskripsi,
+                'status'          => $request->status,
+                'updated_at'      => now(),
+            ];
+
+            if ($prodiColumn) {
+                $data[$prodiColumn] = $request->prodi;
+            }
+
             $cekDataLama = DB::table('log_pengajuan_judul')
-                ->where('id_pengajuan', $request->id_pengajuan)
+                ->where($idColumn, $request->id_pengajuan)
                 ->first();
 
             if ($cekDataLama) {
-                // Update data yang sudah ada (misal status berubah)
                 DB::table('log_pengajuan_judul')
-                    ->where('id_pengajuan', $request->id_pengajuan)
-                    ->update([
-                        'nim'            => $request->nim,
-                        'nama_mahasiswa' => $request->nama_mahasiswa,
-                        'prodi'          => $request->prodi,
-                        'fakultas'       => $request->fakultas,
-                        'judul'          => $request->judul,
-                        'deskripsi'      => $request->deskripsi,
-                        'status'         => $request->status,
-                        'updated_at'     => now()
-                    ]);
+                    ->where($idColumn, $request->id_pengajuan)
+                    ->update($data);
 
-                $pesanAction = '🚀 Status pengajuan judul berhasil DI-UPDATE menjadi ' . $request->status . ' di Pusat Data!';
+                $pesanAction = 'Status pengajuan judul berhasil di-update menjadi ' . $request->status . ' di Pusat Data.';
             } else {
-                // Insert data baru
-                DB::table('log_pengajuan_judul')->insert([
-                    'id_pengajuan'   => $request->id_pengajuan,
-                    'nim'            => $request->nim,
-                    'nama_mahasiswa' => $request->nama_mahasiswa,
-                    'prodi'          => $request->prodi,
-                    'fakultas'       => $request->fakultas,
-                    'judul'          => $request->judul,
-                    'deskripsi'      => $request->deskripsi,
-                    'status'         => $request->status,
-                    'created_at'     => now(),
-                    'updated_at'     => now()
-                ]);
+                $data['created_at'] = now();
 
-                $pesanAction = '✨ Data pengajuan judul baru berhasil DICATAT & DISINKRONISASI ke Pusat Data!';
+                DB::table('log_pengajuan_judul')->insert($data);
+
+                $pesanAction = 'Data pengajuan judul baru berhasil dicatat dan disinkronisasi ke Pusat Data.';
             }
 
             return response()->json([

@@ -169,4 +169,81 @@ class PemasokDataController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * FUNGSI 4: Distribusi data presensi ke sistem-presensi lain (untuk sinkronisasi)
+     * Endpoint ini memungkinkan sistem-presensi mengambil data presensi dari pusat data
+     */
+    public function ambilDataPresensi(Request $request)
+    {
+        try {
+            $query = LogPresensi::query();
+
+            // Filter berdasarkan tanggal jika ada
+            if ($request->has('tanggal_mulai')) {
+                $query->where('waktu', '>=', $request->tanggal_mulai);
+            }
+
+            if ($request->has('tanggal_selesai')) {
+                $query->where('waktu', '<=', $request->tanggal_selesai);
+            }
+
+            // Filter berdasarkan NIM jika ada
+            if ($request->has('nim_mahasiswa')) {
+                $query->where('nim_mahasiswa', $request->nim_mahasiswa);
+            }
+
+            // Filter berdasarkan kode kelas jika ada
+            if ($request->has('kode_kelas')) {
+                $query->where('kode_kelas', $request->kode_kelas);
+            }
+
+            // Ambil data dengan pagination atau limit
+            $limit = $request->input('limit', 100);
+            $data = $query->orderBy('waktu', 'desc')
+                ->limit($limit)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data presensi berhasil diambil',
+                'data' => $data,
+                'total' => $data->count()
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data presensi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * FUNGSI 5: Cek status sinkronisasi dan statistik data
+     */
+    public function statusSinkronisasi()
+    {
+        try {
+            $totalPresensi = LogPresensi::count();
+            $presensiHariIni = LogPresensi::whereDate('waktu', today())->count();
+            $sistemAktif = LogPresensi::distinct('sistem_asal')->count('sistem_asal');
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total_presensi' => $totalPresensi,
+                    'presensi_hari_ini' => $presensiHariIni,
+                    'sistem_aktif' => $sistemAktif,
+                    'last_sync' => LogPresensi::latest('created_at')->first()?->created_at,
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

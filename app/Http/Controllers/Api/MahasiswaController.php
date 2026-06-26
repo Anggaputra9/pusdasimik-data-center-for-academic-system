@@ -112,4 +112,63 @@ class MahasiswaController extends Controller
             'message' => 'Data mahasiswa berhasil dihapus'
         ]);
     }
+
+    /**
+     * Check student permissions based on status
+     */
+    public function checkPermissions(string $nim): JsonResponse
+    {
+        $mahasiswa = Mahasiswa::find($nim);
+
+        if (!$mahasiswa) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data mahasiswa tidak ditemukan',
+                'permissions' => [
+                    'can_borrow_book' => false,
+                    'can_attend' => false,
+                    'can_submit_thesis' => false,
+                ]
+            ], 404);
+        }
+
+        // Logika permissions berdasarkan status
+        $permissions = $this->getPermissionsByStatus($mahasiswa->status);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'nim' => $mahasiswa->nim,
+                'nama' => $mahasiswa->nama,
+                'status' => $mahasiswa->status,
+                'status_label' => $mahasiswa->status_label,
+                'permissions' => $permissions,
+            ]
+        ]);
+    }
+
+    /**
+     * Get permissions based on student status
+     */
+    private function getPermissionsByStatus(string $status): array
+    {
+        return match($status) {
+            'aktif' => [
+                'can_borrow_book' => true,
+                'can_attend' => true,
+                'can_submit_thesis' => true,
+            ],
+            'cuti' => [
+                'can_borrow_book' => true,
+                'can_attend' => false,
+                'can_submit_thesis' => false,
+            ],
+            // lulus, do, atau status lainnya dianggap tidak aktif
+            default => [
+                'can_borrow_book' => false,
+                'can_attend' => false,
+                'can_submit_thesis' => false,
+            ],
+        };
+    }
 }
